@@ -75,6 +75,7 @@ def network_raster_plot(pop1 = None,
                         N_pop1 = None,
                         N_pop2 = None,
                         N_pop3 = None,
+                        marker = None, 
                         markersize = None,
                         x_lim = None):
     
@@ -82,23 +83,28 @@ def network_raster_plot(pop1 = None,
         m_size = 1
     else:
         m_size = markersize
-        
+
+    if marker == None:
+        marker = '.'    
+    
     fig = plt.figure(figsize=(10, 6))
     offset = 0
 
+
+        
     if pop1 != None:
         # Plot FS interneurons
-        plt.plot(pop1.t / b2.second, pop1.i + offset, ',', color=color['FS'], label='FS', markersize=m_size)
+        plt.plot(pop1.t / b2.second, pop1.i + offset, marker=marker, linestyle='',  color=color['FS'], label='FS', markersize=m_size)
         offset += N_pop1
 
     if pop2 != None:    
         # Plot RS excitatory neurons
-        plt.plot(pop2.t / b2.second, pop2.i + offset, ',', color=color['RS'], label='RS', markersize=m_size)
+        plt.plot(pop2.t / b2.second, pop2.i + offset, marker=marker, linestyle='', color=color['RS'], label='RS', markersize=m_size)
         offset += N_pop2
 
     if pop3 != None:    
     # Plot impaired models
-        plt.plot(pop3.t / b2.second, pop3.i + offset, ',', color=color['IMP'], label='IMP', markersize=m_size)
+        plt.plot(pop3.t / b2.second, pop3.i + offset, marker=marker, linestyle='', color=color['IMP'], label='IMP', markersize=m_size)
     
     if x_lim != None:
         plt.xlim(x_lim)
