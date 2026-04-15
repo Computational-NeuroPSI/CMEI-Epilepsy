@@ -12,6 +12,8 @@ import pandas as pd
 
 import brian2 as b2
 
+from utils.NN_simulation_analysis_helper import *
+
 color = {
     'FS':  '#cb181d',
     'RS':  '#238b45',
