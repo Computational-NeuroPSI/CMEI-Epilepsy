@@ -5,7 +5,15 @@ import os
 import matplotlib.pyplot as plt
 import brian2 as b2
 
-implemented_neuron_models = ['FS_cr', 'RS_cr', 'IMP_cr']
+implemented_neuron_models = ['FS_cr',
+                             'FS_cr_tau_r_08',
+                             'FS_cr_tau_r_1',
+                             'RS_cr',
+                             'RS_cr_tau_r_08',
+                             'RS_cr_tau_r_1',
+                             'IMP_cr',
+                             'IMP_cr_Z0_-50_tau_r_08',
+                             'IMP_cr_Z0_-50_tau_r_1']
 
 #--------------------------------------------------
 color = {
@@ -42,7 +50,7 @@ dw/dt = (a*(v-El)-w)/tau_w:ampere
 dGsynI/dt = -GsynI/Tsyn_i : siemens
 dGsynE/dt = -GsynE/Tsyn_e : siemens
 Itot = (GsynI+GsynE)*v : ampere 
-Is = current(t) : ampere
+Is:ampere
 Cm:farad
 gl:siemens
 El:volt
@@ -91,7 +99,7 @@ dGsynE/dt = -GsynE/Tsyn_e : siemens
 Itot = (GsynI+GsynE)*v : ampere 
 eps:second
 Z0:volt
-Is = current(t) : ampere
+Is:ampere
 Cm:farad
 gl:siemens
 gp:siemens
