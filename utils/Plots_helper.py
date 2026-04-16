@@ -696,7 +696,7 @@ def plot_regime_summary(time_bins,
     return fig
 
 #--------------------------------------------------
-def plot_synch_panels_h5(pops, ictal, interictal, sync_FS, sync_RS, sync_IMP, 
+def plot_synchrony_panels_h5(pops, ictal, interictal, sync_FS, sync_RS, sync_IMP, 
                           time_bins, split_time=62):
     fig = plt.figure(figsize=(10,7)) 
     rows = 3
@@ -766,7 +766,99 @@ def plot_synch_panels_h5(pops, ictal, interictal, sync_FS, sync_RS, sync_IMP,
     plt.tight_layout()
     return fig
 
-
+#--------------------------------------------------
+def plot_synchrony_panels_extended_5(results, pops, sync_FS, sync_RS, sync_IMP, 
+                                         mean_rate_FS, mean_rate_RS, mean_rate_IMP,
+                                         time_bins, spike_data, split_time=15):
+    
+        fig = plt.figure(figsize=(14, 20)) 
+        rows = 5
+    
+        # --- ROW 0: Raster ---
+        ax0 = plt.subplot2grid((rows, 2), (0, 0), colspan=2)
+        offset = 0
+        for pop in pops:
+            ax0.scatter(spike_data[pop]['t'], spike_data[pop]['i'] + offset, 
+                        s=1, color=color[pop], marker='.', alpha=0.4)
+            offset += spike_data[pop]['i'].max() + 100
+        ax0.set_title("Population Raster Plot")
+        ax0.set_ylabel("Neuron Index")
+        plt.setp(ax0.get_xticklabels(), visible=False)
+    
+        # --- ROW 1: Firing Rate ---
+        ax1 = plt.subplot2grid((rows, 2), (1, 0), colspan=2, sharex=ax0)
+        ax1.plot(time_bins, mean_rate_FS, color=color['FS'], label='FS Rate', alpha=0.8)
+        ax1.plot(time_bins, mean_rate_RS, color=color['RS'], label='RS Rate', alpha=0.8)
+        ax1.plot(time_bins, mean_rate_IMP, color=color['IMP'], label='IMP Rate', alpha=0.8)
+        ax1.set_title("Population Firing Rate (Hz)")
+        ax1.legend(loc='upper right')
+        plt.setp(ax1.get_xticklabels(), visible=False)
+    
+        # --- ROW 2: STTC Synchrony ---
+        ax2 = plt.subplot2grid((rows, 2), (2, 0), colspan=2, sharex=ax0)
+        ax2.plot(time_bins, sync_FS, color=color['FS'], label='FS (STTC)')
+        ax2.plot(time_bins, sync_RS, color=color['RS'], label='RS (STTC)')
+        ax2.plot(time_bins, sync_IMP, color=color['IMP'], label='IMP (STTC)')
+        ax2.axvline(split_time, color='black', linestyle='--')
+        ax2.set_title("A. Synchrony over time (STTC)")
+        ax2.set_ylabel("STTC Correlation Index")
+        ax2.set_ylim(-0.1, 1.1) 
+        ax2.legend()
+    
+        # --- DATA PREPARATION ---
+        sync_ictal = {}
+        sync_inter = {}
+        for pop, sync in zip(pops, [sync_FS, sync_RS, sync_IMP]):
+            sync_ictal[pop] = compute_interval_synchrony(results[f'ictal_{pop}'], time_bins, sync)
+            sync_inter[pop] = compute_interval_synchrony(results[f'interictal_{pop}'], time_bins, sync)
+    
+        # --- ROW 3: ICTAL ANALYSES (B & C) ---
+        axB = plt.subplot2grid((rows, 2), (3, 0)) 
+        axC = plt.subplot2grid((rows, 2), (3, 1)) 
+        
+        sync_data_ictal = []
+        labels_ictal = []
+        for pop in pops:
+            d = [x[1] for x in sync_ictal[pop]]
+            s = [x[2] for x in sync_ictal[pop]]
+            axB.scatter(d, s, color=color[pop], alpha=0.7)
+            
+            pre, post = split_intervals(sync_ictal[pop], split_time)
+            sync_data_ictal.extend([[x[2] for x in pre], [x[2] for x in post]])
+            labels_ictal.extend([f'{pop}\nPre', f'{pop}\nPost'])
+    
+        axB.set_title("B. ICTAL: Sync vs Duration")
+        axB.set_xlabel("Duration (s)")
+        axB.set_ylabel("Synchrony Index")
+        axC.boxplot(sync_data_ictal, medianprops={'color': '#e7298a', 'linewidth': 2.5})
+        axC.set_xticklabels(labels_ictal, rotation=45)
+        axC.set_title("C. ICTAL: Pre vs Post")
+    
+        # --- ROW 4: INTERICTAL ANALYSES (D & E) ---
+        axD = plt.subplot2grid((rows, 2), (4, 0))
+        axE = plt.subplot2grid((rows, 2), (4, 1))
+        
+        sync_data_inter = []
+        labels_inter = []
+        for pop in pops:
+            d = [x[1] for x in sync_inter[pop]]
+            s = [x[2] for x in sync_inter[pop]]
+            axD.scatter(d, s, color=color[pop], alpha=0.7)
+            
+            pre, post = split_intervals(sync_inter[pop], split_time)
+            sync_data_inter.extend([[x[2] for x in pre], [x[2] for x in post]])
+            labels_inter.extend([f'{pop}\nPre', f'{pop}\nPost'])
+    
+        axD.set_title("D. INTERICTAL: Sync vs Duration")
+        axD.set_xlabel("Duration (s)")
+        axD.set_ylabel("Synchrony Index")
+        axE.boxplot(sync_data_inter, medianprops={'color': '#bfd3e6', 'linewidth': 2.5})
+        axE.set_xticklabels(labels_inter, rotation=45)
+        axE.set_title("E. INTERICTAL: Pre vs Post")
+    
+        plt.tight_layout()
+    
+        return fig
 
 
 
