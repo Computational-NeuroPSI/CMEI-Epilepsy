@@ -1,0 +1,23 @@
+[
+    {
+        "metainfo": "Network config file -- sim 80p",
+        "network_composition": {
+            "tot_neurons": 10000,
+            "FS_neuron": 2000,
+            "RS_neuron": 1600,
+            "IMP_neuron": 6400,
+            "conn_prob": 0.05
+        },
+        "external_input": {
+            "N_external_exc": 8000,
+            "N_external_inh": 2000,            
+            "conn_prob": 0.05
+        },
+        "background_input": {
+            "freq": 0.1
+        },
+        "units": {
+            "freq": "Hz"
+        }
+    }
+]
