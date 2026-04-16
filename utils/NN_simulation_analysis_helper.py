@@ -27,7 +27,7 @@ def load_spike_h5(fname):
     return meta, spikes
 
 #--------------------------------------------------
-def load_ictal_interictal_synch_h5(fname):
+def load_ictal_interictal_synchro_h5(fname):
     """Load spikes and metadata from a single HDF5 file following the described structure."""
     with h5py.File(fname, "r") as f:
 
@@ -35,10 +35,10 @@ def load_ictal_interictal_synch_h5(fname):
         for k in f["metadata"].keys():
             meta[k] = f["metadata"][k][()]
         
-        # population ictal, interictal and synch values
+        # population ictal, interictal and synchro values
         ictal = {}
         interictal= {}
-        synch = {}
+        synchro = {}
 
         for pop in ("FS", "RS", "IMP"):
 
@@ -46,10 +46,10 @@ def load_ictal_interictal_synch_h5(fname):
             ictal[pop] = f[dat_ictal][()]
             dat_interictal = f"/interictal/interictal_{pop}"
             interictal[pop] = f[dat_interictal][()]
-            dat_synch = f"/synch/sync_{pop}"
-            synch[pop] = f[dat_synch][()]
+            dat_synchro = f"/synchro/synchro_{pop}"
+            synchro[pop] = f[dat_synchro][()]
             
-    return meta, ictal, interictal, synch
+    return meta, ictal, interictal, synchro
 
 #--------------------------------------------------
 def compute_population_rate(spike_times, bin_edges, N_neurons):
