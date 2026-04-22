@@ -11,11 +11,24 @@ color = {
 
 #--------------------------------------------------
 def load_spike_h5(fname):
-    """Load spikes and metadata from a single HDF5 file following the described structure."""
+    """
+    Load spikes and metadata from a single HDF5 file.
+    
+    Returns a dictionary with:
+    - 'metadata': dict of scalar values
+    - 'spikes': {
+          'FS': {'i': array, 't': array},
+          'RS': {'i': array, 't': array},
+          'IMP': {'i': array, 't': array}
+      }
+    """
+    data = {}
     with h5py.File(fname, "r") as f:
         meta = {}
         for k in f["metadata"].keys():
             meta[k] = f["metadata"][k][()]
+        data["metadata"] = meta
+        
         # population spike arrays
         spikes = {}
         for pop in ("FS", "RS", "IMP"):
@@ -24,7 +37,8 @@ def load_spike_h5(fname):
             t = f[grp + "/t"][()]
             # indices i are neuron ids (0..N-1) relative to that population
             spikes[pop] = {"i": i.astype(int), "t": t.astype(float)}
-    return meta, spikes
+        data["spikes"] = spikes    
+    return data
 
 #--------------------------------------------------
 def load_ictal_interictal_synchro_h5(fname):
@@ -61,101 +75,6 @@ def compute_population_rate(spike_times, bin_edges, N_neurons):
     rate = counts / (N_neurons * dt)
     return rate
     
-#--------------------------------------------------
-def plotting_pop_freq_and_std_h5(sim_duration = None, 
-                              pop1 = None, 
-                              pop2 = None, 
-                              pop3 = None,
-                              N_pop1 = None,
-                              N_pop2 = None,
-                              N_pop3 = None,
-                              bin_size = None):
-
-    # Parameters
-    if bin_size == None:
-        bin_size = 0.1 * b2.second
-    bin_edges = np.arange(0, sim_duration + bin_size, bin_size)
-    time_bins = bin_edges[:-1]
-    
-    # Create spike matrix: (n_neurons, n_time_bins)
-    spike_matrix_FS = np.zeros((N_pop1, len(time_bins)))
-    spike_matrix_RS = np.zeros((N_pop2, len(time_bins)))
-    if pop3 != None:
-        spike_matrix_IMP = np.zeros((N_pop3, len(time_bins)))
-    
-    # Fill the spike matrix
-    for i, t in zip(pop1['i'], pop1['t'] / b2.second):
-        bin_idx = int(t // bin_size)
-        if bin_idx < len(time_bins):
-            spike_matrix_FS[i, bin_idx] += 1
-    
-    for i, t in zip(pop2['i'], pop2['t'] / b2.second):
-        bin_idx = int(t // bin_size)
-        if bin_idx < len(time_bins):
-            spike_matrix_RS[i, bin_idx] += 1
-
-    if pop3 != None:
-        for i, t in zip(pop3['i'], pop3['t'] / b2.second):
-            bin_idx = int(t // bin_size)
-            if bin_idx < len(time_bins):
-                spike_matrix_IMP[i, bin_idx] += 1
-    
-    # Convert to rate (Hz)
-    spike_matrix_FS /= bin_size
-    spike_matrix_RS /= bin_size
-    if pop3 != None:
-        spike_matrix_IMP /= bin_size
-    
-    
-    # Compute mean and std
-    mean_rate_FS = np.mean(spike_matrix_FS, axis=0)
-    std_rate_FS = np.std(spike_matrix_FS, axis=0)
-    mean_rate_RS = np.mean(spike_matrix_RS, axis=0)
-    std_rate_RS = np.std(spike_matrix_RS, axis=0)
-    if pop3 != None:
-        mean_rate_IMP = np.mean(spike_matrix_IMP, axis=0)
-        std_rate_IMP = np.std(spike_matrix_IMP, axis=0)
-    
-    
-    fig = plt.figure(figsize=(8, 6))
-    plt.plot(time_bins, mean_rate_FS, '.-', label='avg FS freq', color='#cb181d')
-    plt.plot(time_bins, mean_rate_RS, '.-', label='avg RS freq', color='#238b45')
-    if pop3 != None:
-        plt.plot(time_bins, mean_rate_IMP, '.-', label='avg IMP freq', color='#2171b5')
-    
-    plt.fill_between(
-        time_bins,
-        #np.clip(mean_rate_FS - std_rate_FS, 0*b2.Hz, None),    # to avoid negative firing rate
-        (mean_rate_FS - std_rate_FS).clip(0 * b2.Hz, np.inf * b2.Hz),
-        mean_rate_FS + std_rate_FS,
-        color='#cb181d', alpha=0.3, label='± FS std'
-    )
-    
-    plt.fill_between(
-        time_bins,
-        #np.clip(mean_rate_RS - std_rate_RS, 0*b2.Hz, None),    # to avoid negative firing rate
-        (mean_rate_RS - std_rate_RS).clip(0 * b2.Hz, np.inf * b2.Hz),
-        mean_rate_RS + std_rate_RS,
-        color='#238b45', alpha=0.3, label='± RS std'
-    )
-
-    if pop3 != None:
-        plt.fill_between(
-            time_bins,
-            #np.clip(mean_rate_IMP - std_rate_IMP, 0*b2.Hz, None),  # to avoid negative firing rate
-            (mean_rate_IMP - std_rate_IMP).clip(0 * b2.Hz, np.inf * b2.Hz),
-            mean_rate_IMP + std_rate_IMP,
-            color='#2171b5', alpha=0.3, label='± IMP std'
-        )
-    
-    plt.xlabel('Time (s)')
-    plt.ylabel(f'Firing rate (Hz, bin={int(bin_size*1000)} ms)')
-    plt.title('Network Population firing rate ± std')
-    plt.legend()
-    plt.tight_layout()
-   
-    return fig, time_bins, mean_rate_FS, mean_rate_RS, mean_rate_IMP
-
 #--------------------------------------------------
 def extract_regime_intervals(time_bins,
                              rate,

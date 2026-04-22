@@ -160,28 +160,28 @@ def network_raster_plot_h5(pop1 = None,
 
     if pop1 != None:
         # Plot FS interneurons
-        plt.plot(pop1['t'], pop1['i'] + offset, ',', color=color['FS'], label='FS', markersize=m_size)
+        plt.plot(pop1['t'], pop1['i'] + offset, ',', color=color['FS'], label='FS', markersize=m_size, rasterized = True)
         offset += N_pop1
 
     if pop2 != None:    
         # Plot RS excitatory neurons
-        plt.plot(pop2['t'], pop2['i'] + offset, ',', color=color['RS'], label='RS', markersize=m_size)
+        plt.plot(pop2['t'], pop2['i'] + offset, ',', color=color['RS'], label='RS', markersize=m_size, rasterized = True)
         offset += N_pop2
 
     if pop3 != None:    
     # Plot impaired models
-        plt.plot(pop3['t'], pop3['i'] + offset, ',', color=color['IMP'], label='IMP', markersize=m_size)
+        plt.plot(pop3['t'], pop3['i'] + offset, ',', color=color['IMP'], label='IMP', markersize=m_size, rasterized = True)
     
     if x_lim != None:
         plt.xlim(x_lim)
-    
+
+    plt.xticks([0,5,45,65])
+    plt.yticks([N_pop1, N_pop1 + N_pop2, N_pop1 + N_pop2 + N_pop3])
     plt.xlabel('Time (s)')
     plt.ylabel('Neuron index (with offsets)')
     plt.title('Network Raster Plot')
     
-    # Force y-axis to use integer ticks
     ax = plt.gca()
-    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     
     return fig
 
@@ -363,7 +363,9 @@ def plotting_pop_freq_and_std_h5(sim_duration = None,
                               N_pop1 = None,
                               N_pop2 = None,
                               N_pop3 = None,
-                              bin_size = None):
+                              bin_size = None,
+                              title = None,
+                              fig_size = None):
 
     # Parameters
     if bin_size == None:
@@ -410,8 +412,11 @@ def plotting_pop_freq_and_std_h5(sim_duration = None,
         mean_rate_IMP = np.mean(spike_matrix_IMP, axis=0)
         std_rate_IMP = np.std(spike_matrix_IMP, axis=0)
     
-    
-    fig = plt.figure(figsize=(8, 6))
+    if fig_size == None:
+        fig = plt.figure(figsize=(8, 6))
+    else:
+        fig = plt.figure(figsize=fig_size)
+        
     plt.plot(time_bins, mean_rate_FS, '.-', label='avg FS freq', color='#cb181d')
     plt.plot(time_bins, mean_rate_RS, '.-', label='avg RS freq', color='#238b45')
     if pop3 != None:
@@ -444,7 +449,11 @@ def plotting_pop_freq_and_std_h5(sim_duration = None,
     
     plt.xlabel('Time (s)')
     plt.ylabel(f'Firing rate (Hz, bin={int(bin_size*1000)} ms)')
-    plt.title('Network Population firing rate ± std')
+    if title == None:
+        plt.title('Network Population firing rate ± std')
+    else:
+        plt.title(title)
+        
     plt.legend()
     plt.tight_layout()
    
@@ -484,11 +493,14 @@ def plot_regime_timeline(results, split_time=42):
     return fig
 
 #--------------------------------------------------
-def plot_regime_timeline_h5(ictal, interictal, pops, split_time=42):
+def plot_regime_timeline_h5(ictal, interictal, pops, split_time=42, fig_size=None):
 
     y_positions = {pop: i for i, pop in enumerate(pops)}
 
-    fig, ax = plt.subplots(figsize=(7, 4))
+    if fig_size == None:
+        fig, ax = plt.subplots(figsize=(7, 4))
+    else:
+        fig, ax = plt.subplots(figsize=fig_size)
 
     for pop in pops:
         y = y_positions[pop]
@@ -765,7 +777,26 @@ def plot_synchrony_panels_h5(pops, ictal, interictal, sync_FS, sync_RS, sync_IMP
 
     plt.tight_layout()
     return fig
+    
+#--------------------------------------------------
+def plot_synchrony_STTCs_h5(sync_FS, sync_RS, sync_IMP, 
+                          time_bins, split_time=45, fig_size=None):
 
+    if fig_size == None:
+        fig = plt.figure(figsize=(8,6))
+    else:
+        fig = plt.figure(figsize = fig_size)
+
+    plt.plot(time_bins, sync_FS, color=color['FS'], label='FS (STTC)')
+    plt.plot(time_bins, sync_RS, color=color['RS'], label='RS (STTC)')
+    plt.plot(time_bins, sync_IMP, color=color['IMP'], alpha=0.4,label='IMP (STTC)')
+    plt.axvline(split_time, color='black', linestyle='--')
+    plt.title("Synchrony over time (STTC)")
+    plt.ylabel("STTC Correlation Index")
+    plt.ylim(-0.1, 1.1) 
+    plt.legend()
+
+    return fig
 #--------------------------------------------------
 def plot_synchrony_panels_extended_5(results, pops, sync_FS, sync_RS, sync_IMP, 
                                          mean_rate_FS, mean_rate_RS, mean_rate_IMP,
@@ -787,9 +818,9 @@ def plot_synchrony_panels_extended_5(results, pops, sync_FS, sync_RS, sync_IMP,
     
         # --- ROW 1: Firing Rate ---
         ax1 = plt.subplot2grid((rows, 2), (1, 0), colspan=2, sharex=ax0)
-        ax1.plot(time_bins, mean_rate_FS, color=color['FS'], label='FS Rate', alpha=0.8)
-        ax1.plot(time_bins, mean_rate_RS, color=color['RS'], label='RS Rate', alpha=0.8)
-        ax1.plot(time_bins, mean_rate_IMP, color=color['IMP'], label='IMP Rate', alpha=0.8)
+        ax1.plot(time_bins, mean_rate_FS, color=color['FS'], label='FS Rate') #, alpha=0.8)
+        ax1.plot(time_bins, mean_rate_RS, color=color['RS'], label='RS Rate') #, alpha=0.8)
+        ax1.plot(time_bins, mean_rate_IMP, color=color['IMP'], label='IMP Rate') #, alpha=0.8)
         ax1.set_title("Population Firing Rate (Hz)")
         ax1.legend(loc='upper right')
         plt.setp(ax1.get_xticklabels(), visible=False)
@@ -859,6 +890,99 @@ def plot_synchrony_panels_extended_5(results, pops, sync_FS, sync_RS, sync_IMP,
         plt.tight_layout()
     
         return fig
+    
+#--------------------------------------------------
+def plot_timeline_and_boxplots_h5(
+    pops, ictal, interictal,
+    sync_FS, sync_RS, sync_IMP,
+    time_bins,
+    split_time=42,
+    fig_size=(6, 9)
+    ):
+    fig, axes = plt.subplots(3, 1, figsize=fig_size)
 
+    # -------------------------
+    # PANEL 1: REGIME TIMELINE
+    # -------------------------
+    ax0 = axes[0]
+    y_positions = {pop: i for i, pop in enumerate(pops)}
 
+    for pop in pops:
+        y = y_positions[pop]
+
+        # ICTAL
+        for start, duration, rate in ictal[f'{pop}']:
+            ax0.broken_barh([(start, duration)], (y - 0.3, 0.25),
+                            facecolors='#e7298a')
+
+        # INTERICTAL
+        for start, duration, rate in interictal[f'{pop}']:
+            ax0.broken_barh([(start, duration)], (y + 0.05, 0.25),
+                            facecolors='#bfd3e6')
+
+    ax0.axvline(split_time, linestyle='--', color='k')
+    ax0.set_yticks(list(y_positions.values()))
+    ax0.set_yticklabels(pops)
+    ax0.set_xlabel("Time (s)")
+    ax0.set_title("Ictal / Interictal Regimes")
+
+    # -------------------------
+    # DATA PREPARATION
+    # -------------------------
+    sync_ictal = {}
+    sync_inter = {}
+    for pop, sync in zip(pops, [sync_FS, sync_RS, sync_IMP]):
+        sync_ictal[pop] = compute_interval_synchrony(
+            ictal[f'{pop}'], time_bins, sync
+        )
+        sync_inter[pop] = compute_interval_synchrony(
+            interictal[f'{pop}'], time_bins, sync
+        )
+
+    # -------------------------
+    # PANEL 2: ICTAL 
+    # -------------------------
+    ax1 = axes[1]
+
+    sync_data_ictal = []
+    labels_ictal = []
+
+    for pop in pops:
+        pre, post = split_intervals(sync_ictal[pop], split_time)
+        sync_data_ictal.extend([
+            [x[2] for x in pre],
+            [x[2] for x in post]
+        ])
+        labels_ictal.extend([f'{pop}\nInput', f'{pop}\nPost'])
+
+    ax1.boxplot(sync_data_ictal,
+                medianprops={'color': '#e7298a', 'linewidth': 2.5})
+    ax1.set_xticklabels(labels_ictal, rotation=45)
+    ax1.set_ylabel("Synchrony Index")
+    ax1.set_title("Ictal: During vs Post Input")
+
+    # -------------------------
+    # PANEL 3: INTERICTAL
+    # -------------------------
+    ax2 = axes[2]
+
+    sync_data_inter = []
+    labels_inter = []
+
+    for pop in pops:
+        pre, post = split_intervals(sync_inter[pop], split_time)
+        sync_data_inter.extend([
+            [x[2] for x in pre],
+            [x[2] for x in post]
+        ])
+        labels_inter.extend([f'{pop}\nInput', f'{pop}\nPost'])
+
+    ax2.boxplot(sync_data_inter,
+                medianprops={'color': '#bfd3e6', 'linewidth': 2.5})
+    ax2.set_xticklabels(labels_inter, rotation=45)
+    ax2.set_ylabel("Synchrony Index")
+    ax2.set_title("Interictal: During vs Post Input")
+
+    plt.tight_layout()
+    return fig
 
