@@ -7,13 +7,51 @@ import brian2 as b2
 
 implemented_neuron_models = ['FS_cr',
                              'FS_cr_tau_r_08',
+                             'FS_cr_tau_r_09',
                              'FS_cr_tau_r_1',
+                             'FS_cr_tau_r_11',
+                             'FS_cr_tau_r_12',
                              'RS_cr',
                              'RS_cr_tau_r_08',
+                             'RS_cr_tau_r_09',
                              'RS_cr_tau_r_1',
+                             'RS_cr_tau_r_11',
+                             'RS_cr_tau_r_12',
                              'IMP_cr',
+                             'IMP_cr_Z0_m80',
+                             'IMP_cr_Z0_m70',
+                             'IMP_cr_Z0_m60',
+                             'IMP_cr_Z0_m50',
+                             'IMP_cr_Z0_m40',
+                             'IMP_cr_Z0_m30',
+                             'IMP_cr_Z0_m20',
+                             'IMP_cr_Z0_m10',
+                             'IMP_cr_Z0_-10_tau_r_1',
+                             'IMP_cr_Z0_-10_tau_r_08',
+                             'IMP_cr_Z0_-10_tau_r_09',
+                             'IMP_cr_Z0_-10_tau_r_11',
+                             'IMP_cr_Z0_-10_tau_r_12',
+                             'IMP_cr_Z0_-20_tau_r_1',
+                             'IMP_cr_Z0_-20_tau_r_08',
+                             'IMP_cr_Z0_-20_tau_r_09',
+                             'IMP_cr_Z0_-20_tau_r_11',
+                             'IMP_cr_Z0_-20_tau_r_12',
+                             'IMP_cr_Z0_-30_tau_r_1',
+                             'IMP_cr_Z0_-30_tau_r_08',
+                             'IMP_cr_Z0_-30_tau_r_09',
+                             'IMP_cr_Z0_-30_tau_r_11',
+                             'IMP_cr_Z0_-30_tau_r_12',
+                             'IMP_cr_Z0_-40_tau_r_1',
+                             'IMP_cr_Z0_-40_tau_r_08',
+                             'IMP_cr_Z0_-40_tau_r_09',
+                             'IMP_cr_Z0_-40_tau_r_11',
+                             'IMP_cr_Z0_-40_tau_r_12',
+                             'IMP_cr_Z0_-50_tau_r_1',
                              'IMP_cr_Z0_-50_tau_r_08',
-                             'IMP_cr_Z0_-50_tau_r_1']
+                             'IMP_cr_Z0_-50_tau_r_09',
+                             'IMP_cr_Z0_-50_tau_r_11',
+                             'IMP_cr_Z0_-50_tau_r_12',
+                             ]
 
 #--------------------------------------------------
 color = {
@@ -217,8 +255,8 @@ def setting_simulation_Brian(idx = None, N_cell = None, neuron_model = None, jso
                                 reset = f'v = {V_reset_value} * mV; w += {b_value} * nA',
                                 refractory = f'{t_ref_value} * ms',
                                 method = 'heun',
-                                #name = neuron_model)
-                                name = 'IMP')
+                                name = neuron_model)
+                                #name = 'IMP')
         #init variables:
         G_imp.v = data[0][idx]['init']['v']*b2.mV
         G_imp.w = data[0][idx]['init']['w']*b2.nA
