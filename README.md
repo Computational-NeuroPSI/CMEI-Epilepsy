@@ -1,7 +1,7 @@
 # CMEI-Epilepsy
 CMEI-Epilepsy: Circadian Modulation of Excitation–Inhibition balance in epileptic networks
 
-**This repository is associated with a paper currently under revision, available on bioRxiv:**
+**This repository is associated with a paper currently under review, available on bioRxiv:**
 [https://www.biorxiv.org/content/10.64898/2026.05.22.726242v1.article-info](https://www.biorxiv.org/content/10.64898/2026.05.22.726242v1.article-info)
 
 ## Overview
