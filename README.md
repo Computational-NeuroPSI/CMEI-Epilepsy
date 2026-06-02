@@ -23,6 +23,7 @@ CMEI-Epilepsy/
 ├── single_neuron_comparison/     # Single-neuron simulation notebooks
 ├── neural_network/               # Small network demo notebook
 ├── simulations/                  # Main simulation scripts and analysis notebooks
+    └── network_config_files      # Json files for setting up the network containing different % of IMP neurons
 │   └── testing_80p_v0/           # Pre-generated simulation output (HDF5 + figures)
 ├── utils/                        # Shared Python utility functions
 └── paper_figures/                # Notebooks to reproduce manuscript figures
