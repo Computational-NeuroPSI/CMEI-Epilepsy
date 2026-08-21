@@ -20,13 +20,14 @@ The simulation scripts are set up with **80% IMP neurons as a working example**,
 CMEI-Epilepsy/
 │
 ├── AdEx_models/                  # Neuron model parameter files (JSON)
-├── single_neuron_comparison/     # Single-neuron simulation notebooks
+├── single_neuron_comparison/     # Single-neuron simulation notebooks and fast-slow dissection of the impaired (IMP) neuron
 ├── neural_network/               # Small network demo notebook
 ├── simulations/                  # Main simulation scripts and analysis notebooks
     └── network_config_files      # Json files for setting up the network containing different % of IMP neurons
-│   └── testing_80p_v0/           # Pre-generated simulation output (HDF5 + figures)
+    └── testing_80p_v0/           # Pre-generated simulation output (HDF5 + figures)
+│   └── sensitivity_analysis      # Pre-generated sensitivity analysis file (.csv) and python file to change the parameters to sweep 
 ├── utils/                        # Shared Python utility functions
-└── paper_figures/                # Notebooks to reproduce manuscript figures
+└── paper_figures/                # Notebooks to reproduce some manuscript figures
 ```
 ## Neuron Models — `AdEx_models/`
  
@@ -38,6 +39,9 @@ Two notebooks allow simulation and visualisation of isolated single neurons (FS,
  
 - **`_current_injection`** — stimulates neurons with current pulses and plots membrane voltage traces and firing rates.
 - **`_synaptic_activation`** — drives neurons via a Poisson spike process and characterises the resulting synaptic responses.
+  
+Python file to run fast-subsystem bifurcation diagram in (z, v) with the slow nullclines v = Z0 - z overlaid for several Z0 (shows Z0 sliding the operating point across the fixed saddle-node fold)
+- **`_supp_fast_slow`** — fast-slow dissection of the impaired (IMP) neurons
 
 ## Small Network Demo — `neural_network/`
  
@@ -67,7 +71,13 @@ Output is written to `testing_80p_v0/`, containing:
 | `ictal_interictal_synchro_IMP_cr_Z0_-50_tau_r_08.h5` | STTC + ictal/interictal classification, tau ratio = 0.8 |
  
 > The `testing_80p_v0/` folder is pre-populated so that analysis notebooks can be run directly without re-running simulations.
- 
+
+It is also possible to run a sensitivity analysis. The default perturbed parameters are C, tau_w and p_conn.
+```bash
+python3 supp_sensitivity_analysis.py
+```
+The output is a CSV that can be plotted using `plot_supp_sensitivity_grid.py` located in the `utils` folder.
+
 ### Analysis notebooks
  
 - **`analysis_hdf5_file_80p_synch.ipynb`** — focused analysis of the STTC and ictal/interictal classification from the `ictal_interictal_synchro_` files.
