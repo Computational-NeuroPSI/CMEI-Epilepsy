@@ -26,8 +26,7 @@ CMEI-Epilepsy/
     └── network_config_files      # Json files for setting up the network containing different % of IMP neurons
     └── testing_80p_v0/           # Pre-generated simulation output (HDF5 + figures)
 │   └── sensitivity_analysis      # Pre-generated sensitivity analysis file (.csv) and python file to change the parameters to sweep 
-├── utils/                        # Shared Python utility functions
-└── paper_figures/                # Notebooks to reproduce some manuscript figures
+└── utils/                        # Shared Python utility functions
 ```
 ## Neuron Models — `AdEx_models/`
  
@@ -86,11 +85,7 @@ The output is a CSV that can be plotted using `plot_supp_sensitivity_grid.py` lo
 ## Utilities — `utils/`
  
 Python modules providing shared functions used across notebooks and simulation scripts, including spike train processing, STTC computation, ictal/interictal classification, and plotting routines.
- 
-## Manuscript Figures — `paper_figures/`
- 
-Notebooks to reproduce the figures in the associated manuscript are being added to this folder. Each notebook is self-contained and references the pre-generated data in `testing_xxx/` or can be rerun after new simulations.
- 
+  
 ## Citation
  
 If you use this code or data in your work, please cite the associated preprint:
